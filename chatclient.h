@@ -18,5 +18,6 @@
 #include <netdb.h>
 #include  <fcntl.h>
 
+int serverSetUp(char * serverName, int portno);
 
 #endif /* CHATCLIENT_H_ */
