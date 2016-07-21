@@ -6,28 +6,61 @@
  */
 #include "chatclient.h"
 
+
 int main(int argc, char *argv[])
 {
-	int sockfd, n, filesize, index;
+	int sockfd; //, n, filesize, index;
 	char newmessage[500];
 	sockfd = serverSetUp(argv[1],atoi(argv[2]));
-    n = write(sockfd, "abc", strlen("abc"));
+	recieveMessage(newmessage, sockfd);
+	return 0;
+}
 
-    filesize=4;
+/*
+ * Protocol : receive two messages. First message is size of string about to be sent. It is a value between 0-500 and
+ * is determined by stringsize + 100 (to get a constant byte size of 4) Second message is string of size.
+ * */
+void recieveMessage(char * message, int sockfd)
+{
+	int index, n, filesize;
+	memset(message, '\0', 500);
+
+	/*
+	 * This will read in 3 characters, between 101 and 601. This is because each message is 500 characters.
+	 * */
     index = 0;
-	while(index < filesize)
+	while(index < NET_CHAR_NUMBER)
 	 {
-	     n = read(sockfd, &newmessage[index], filesize-index);
+	     n = read(sockfd, &message[index], NET_CHAR_NUMBER - index);
         if (n < 0)
            perror("ERROR reading from socket");
      	 index+=n;
+	 }
+	message[NET_CHAR_NUMBER] = '\0';
 
-     	 printf("%d", n);
+	/*
+	 * Manipulate the message to see value of string heading our way.
+	 * */
+	filesize  = atoi(message);
+	filesize -= 100;
+
+
+	/*
+	 * Set size of index to 0, reset message, and receive the message from server.
+	 * */
+	index = 0;
+	memset(message, '\0', 500);
+	while(index < filesize)
+	 {
+		n = read(sockfd, &message[index], (filesize+1)-index);
+		if (n < 0)
+			perror("ERROR reading from socket");
+			index+=n;
 	 }
 
-	 printf("%s", newmessage);
+   //print message from server. Add newline.
+   printf("%s\n",message);
 
-	return 0;
 }
 
 int serverSetUp(char * serverName, int portno)

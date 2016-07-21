@@ -18,6 +18,10 @@
 #include <netdb.h>
 #include  <fcntl.h>
 
-int serverSetUp(char * serverName, int portno);
+int    NET_CHAR_NUMBER = 3;
+
+int    serverSetUp(char * serverName, int portno);
+void   recieveMessage(char * message, int sockfd);
+void   sendMessage(char * message, int sockfd);
 
 #endif /* CHATCLIENT_H_ */
