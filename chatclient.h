@@ -25,5 +25,6 @@ int    MESSAGE_LENGTH       = 500;
 int    serverSetUp(char * serverName, int portno);
 void   recieveMessage(char * message, int sockfd);
 void   sendMessage(char * message, int sockfd);
+void   checkQuit(char * message);
 
 #endif /* CHATCLIENT_H_ */

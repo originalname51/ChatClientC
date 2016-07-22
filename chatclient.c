@@ -17,14 +17,35 @@ int main(int argc, char *argv[])
 	while(1)
 	{
 	recieveMessage(rMessage, sockfd);
+	checkQuit(rMessage);
 	sendMessage(sMessage, sockfd);
-	recieveMessage(rMessage,sockfd);
+	checkQuit(sMessage);
 	}
 	return 0;
 }
 
+void checkQuit(char * array)
+{
+	int i;
+	char checkArray[5] = "\\quit";
+	char firstArray[5];
+	for(i = 1; i < 7; i++)
+	{
+		firstArray[i-1] = array[i];
+	}
+	firstArray[5] = '\0';
+	if(strcmp(firstArray,checkArray) == 0)
+	{
+		printf("\\quit registered!");
+
+	}
+
+}
+
 /*
- * Send one value to be parsed as an integer. This is string size. Next value is how many characters are being sent.
+ * Send one value to be parsed as an integer.
+ * This is string size.
+ * Next value is how many characters are being sent.
  * */
 void sendMessage(char * message, int sockfd)
 {
@@ -35,7 +56,9 @@ void sendMessage(char * message, int sockfd)
 	memset(message, '\0', MESSAGE_LENGTH);
 
 	sendCount = 0;
-	message = "Hi to the Java Server from the C Client";
+
+	fgets(message, MESSAGE_LENGTH-1, stdin);
+
 	while(iterateChar != '\0')
 	{
 		iterateChar = message[sendCount];
@@ -47,9 +70,7 @@ void sendMessage(char * message, int sockfd)
 	number[NET_CHAR_SEND_INT-1] = '\n';
 	write(sockfd, number, NET_CHAR_SEND_INT);
 	write(sockfd, message, (sendCount-100));
-
 }
-
 /*
  * Protocol : receive two messages. First message is size of string about to be sent. It is a value between 0-500 and
  * is determined by stringsize + 100 (to get a constant byte size of 4) Second message is string of size.
