@@ -18,7 +18,9 @@
 #include <netdb.h>
 #include  <fcntl.h>
 
-int    NET_CHAR_NUMBER = 3;
+int    NET_CHAR_RECIEVE_INT = 3;
+int	   NET_CHAR_SEND_INT    = 5;
+int    MESSAGE_LENGTH       = 500;
 
 int    serverSetUp(char * serverName, int portno);
 void   recieveMessage(char * message, int sockfd);
