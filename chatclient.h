@@ -18,13 +18,15 @@
 #include <netdb.h>
 #include  <fcntl.h>
 
-int    NET_CHAR_RECIEVE_INT = 3;
+int    NET_CHAR_RECIEVE_INT = 4;
 int	   NET_CHAR_SEND_INT    = 5;
 int    MESSAGE_LENGTH       = 500;
+int	   CHAR_OFFSET			= 100;
 
 int    serverSetUp(char * serverName, int portno);
 void   recieveMessage(char * message, int sockfd);
 void   sendMessage(char * message, int sockfd);
-void   checkQuit(char * message);
+int    checkQuit(char * message);
+char * getUserName();
 
 #endif /* CHATCLIENT_H_ */

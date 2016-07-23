@@ -12,34 +12,77 @@ int main(int argc, char *argv[])
 	int sockfd;
 	char rMessage[MESSAGE_LENGTH];
 	char sMessage[MESSAGE_LENGTH];
-	sockfd = serverSetUp(argv[1],atoi(argv[2]));
+//	sockfd = serverSetUp(argv[1],atoi(argv[2]));
+	char * username;
 
-	while(1)
+	username = getUserName();
+
+	printf("%s", username);
+/*	while(1)
 	{
-	recieveMessage(rMessage, sockfd);
-	checkQuit(rMessage);
-	sendMessage(sMessage, sockfd);
-	checkQuit(sMessage);
+		recieveMessage(rMessage, sockfd);
+		if(checkQuit(rMessage) == 0){
+			shutdown(sockfd,2);
+			return 0;
+		}
+		sendMessage(sMessage, sockfd);
+		if(checkQuit(sMessage) == 0){
+			shutdown(sockfd,2);
+			return 0;
+		}
 	}
+	*/
+	free(username);
 	return 0;
 }
 
-void checkQuit(char * array)
+
+char * getUserName()
 {
-	int i;
+char username[13];
+char * returnName;
+memset(username,'\0',10);
+int  nameLength;
+int  i;
+printf("What is your username?\n");
+fgets(username, 12, stdin);
+
+for(i = 0; i < 11; i++ )
+{
+	if(username[i] == '\0')
+	{
+		break;
+	}
+	nameLength++;
+}
+
+returnName = malloc(sizeof(char) * nameLength+1);
+
+for(i = 0; i < nameLength-1;i++)
+{
+	returnName[i] = username[i];
+}
+
+returnName[nameLength-1] = '>';
+returnName[nameLength] = ' ';
+returnName[nameLength+1] = '\0';
+for(i = 0; i < nameLength;i++)
+{
+	printf("%d\n", returnName[i]);
+}
+return returnName;
+}
+
+int checkQuit(char * array)
+{
 	char checkArray[5] = "\\quit";
 	char firstArray[5];
-	for(i = 1; i < 7; i++)
-	{
-		firstArray[i-1] = array[i];
+	int i;
+	for(i = 0; i < 6; i++){
+		firstArray[i] = array[i];
 	}
 	firstArray[5] = '\0';
-	if(strcmp(firstArray,checkArray) == 0)
-	{
-		printf("\\quit registered!");
-
-	}
-
+	return (strcmp(firstArray,checkArray) == 0) ? 0:1;
 }
 
 /*
@@ -54,23 +97,22 @@ void sendMessage(char * message, int sockfd)
 	char number [6];
 
 	memset(message, '\0', MESSAGE_LENGTH);
-
-	sendCount = 0;
-
 	fgets(message, MESSAGE_LENGTH-1, stdin);
 
+	sendCount = 0;
 	while(iterateChar != '\0')
 	{
 		iterateChar = message[sendCount];
 		sendCount++;
 	}
 	sendCount++;
-	sendCount += 100;
+	sendCount += CHAR_OFFSET;
 	sprintf(number,"%d",sendCount);
 	number[NET_CHAR_SEND_INT-1] = '\n';
 	write(sockfd, number, NET_CHAR_SEND_INT);
-	write(sockfd, message, (sendCount-100));
+	write(sockfd, message, (sendCount-CHAR_OFFSET));
 }
+
 /*
  * Protocol : receive two messages. First message is size of string about to be sent. It is a value between 0-500 and
  * is determined by stringsize + 100 (to get a constant byte size of 4) Second message is string of size.
@@ -81,7 +123,7 @@ void recieveMessage(char * message, int sockfd)
 	memset(message, '\0', MESSAGE_LENGTH);
 
 	/*
-	 * This will read in 3 characters, between 101 and 601. This is because each message is 500 characters.
+	 * This will read in 4 characters(3 number characters + a newline), between 101 and 601. This is because each message is 500 characters.
 	 * */
     index = 0;
 	while(index < NET_CHAR_RECIEVE_INT)
@@ -91,14 +133,11 @@ void recieveMessage(char * message, int sockfd)
            perror("ERROR reading from socket");
      	 index+=n;
 	 }
-	message[NET_CHAR_RECIEVE_INT] = '\0';
-
 	/*
 	 * Manipulate the message to see value of string heading our way.
 	 * */
 	filesize  = atoi(message);
-	filesize -= 100;
-
+	filesize -= CHAR_OFFSET;
 
 	/*
 	 * Set size of index to 0, reset message, and receive the message from server.
@@ -107,15 +146,14 @@ void recieveMessage(char * message, int sockfd)
 	memset(message, '\0', MESSAGE_LENGTH);
 	while(index < filesize)
 	 {
-		n = read(sockfd, &message[index], (filesize+1)-index);
+		n = read(sockfd, &message[index], (filesize-index));
 		if (n < 0)
 			perror("ERROR reading from socket");
 			index+=n;
 	 }
 
-   //print message from server. Add newline.
-   printf("%s\n",message);
-
+   //print message from server.
+   printf("%s",message);
 }
 
 int serverSetUp(char * serverName, int portno)
