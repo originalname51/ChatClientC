@@ -13,7 +13,11 @@ Send Message to Server.
 To get the client running do the following.
 
 1) Make sure the server is up and running.
+
 2) Navigate into the C_Client folder.
+
 3) Type "make"
+
 4) Type "./chatclient [HOSTNAME] [PORTNUMBER]"
+
 5) When you are finished conversing with the server type "\quit".
