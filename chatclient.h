@@ -3,6 +3,7 @@
  *
  *  Created on: Jul 19, 2016
  *      Author: rob
+ *      This is the header file to chatclient.c.
  */
 
 #ifndef CHATCLIENT_H_
@@ -12,25 +13,29 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <netdb.h>
-#include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
 
 
+/*
+ * Handle will prepend the hand of the user.
+ * */
 typedef struct handle {
 	char * username;
  	int uNameLength;
 }handle;
 
-int    NET_CHAR_RECIEVE_INT = 4;
-int	   NET_CHAR_SEND_INT    = 5;
-int    MESSAGE_LENGTH       = 500;
-int	   CHAR_OFFSET			= 100;
+const int    NET_CHAR_RECIEVE_INT = 4;		//How many characters are being recieved (int in ASCII)
+const int	   NET_CHAR_SEND_INT    = 5;	//How many characters are being sent. (int in ASCII)
+const int    MESSAGE_LENGTH       = 500;	//Message Length. Can go up to 999 and function as normal.
+const int	   CHAR_OFFSET			= 100;	//offset used to send same # of characters always.
 
-int    serverSetUp(char * serverName, int portno);
-void   recieveMessage(char * message, int sockfd);
-void   sendMessage(char * message, int sockfd, handle * uname);
-int    checkQuit(char * message);
-handle * getUserName();
+int     serverSetUp(char * serverName, int portno);
+void    recieveMessage(char * message, int sockfd);
+void    sendMessage(char * message, int sockfd, handle * uname);
+int     checkQuit(char * message);
+handle* getUserName();
 
 #endif /* CHATCLIENT_H_ */

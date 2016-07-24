@@ -3,6 +3,8 @@
  *
  *  Created on: Jul 19, 2016
  *      Author: rob
+ *
+ *      This program is a chat client made to connect to a Java server.
  */
 #include "chatclient.h"
 
@@ -39,7 +41,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	//This should never return.
-	exit(2);
+	return 0;
 }
 
 /*
@@ -73,7 +75,7 @@ for(i = 0; i < nameLength-1;i++)
 {
 	returnName[i] = username[i];
 }
-//Modify returnname string to have handle.
+//Modify return name string to have handle.
 returnName[nameLength-1] = '>';
 returnName[nameLength] = ' ';
 returnName[nameLength+1] = '\0';
@@ -225,8 +227,8 @@ int serverSetUp(char * serverName, int portno)
 
 	//cast to sockaddr to avoid warning.
 	if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
+		fprintf(stderr,"ERROR connecting. Is Server on?");
 		exit(2);
-		fprintf(stderr,"ERROR connecting");
 	}
 	return sockfd;
 }
