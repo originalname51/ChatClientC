@@ -7,8 +7,9 @@ It will send the first message to the server.
 
 Protocol is:
 
-Send an array of characters to server with ASCII value of message.
-Send Message to Server.
+1)Send an array of characters to server with ASCII value of message(e.g. 124).
+
+2)Send Message to Server.
 
 To get the client running do the following.
 
