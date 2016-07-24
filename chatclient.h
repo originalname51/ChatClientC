@@ -12,11 +12,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <netdb.h>
-#include  <fcntl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+
+
+typedef struct handle {
+	char * username;
+ 	int uNameLength;
+}handle;
 
 int    NET_CHAR_RECIEVE_INT = 4;
 int	   NET_CHAR_SEND_INT    = 5;
@@ -25,8 +29,8 @@ int	   CHAR_OFFSET			= 100;
 
 int    serverSetUp(char * serverName, int portno);
 void   recieveMessage(char * message, int sockfd);
-void   sendMessage(char * message, int sockfd);
+void   sendMessage(char * message, int sockfd, handle * uname);
 int    checkQuit(char * message);
-char * getUserName();
+handle * getUserName();
 
 #endif /* CHATCLIENT_H_ */
