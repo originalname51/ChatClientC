@@ -91,8 +91,8 @@ return UInfo;
 //Check to see if quit was in last message.
 int checkQuit(char * array)
 {
-	char checkArray[5] = "\\quit";
-	char firstArray[5];
+	char checkArray[6] = "\\quit";
+	char firstArray[6];
 	int i;
 	for(i = 0; i < 6; i++){
 		firstArray[i] = array[i];
