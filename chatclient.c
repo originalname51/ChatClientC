@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	int sockfd;
 	char rMessage[MESSAGE_LENGTH];
 	char sMessage[MESSAGE_LENGTH];
-	sockfd = serverSetUp(argv[1],atoi(argv[2]));
+	sockfd = serverSetUp(argv[1],argv[2]);
 	handle * username ;
 
 
@@ -192,43 +192,51 @@ void recieveMessage(char * message, int sockfd)
 }
 /*
  * Most of this code is derived from my operating system class Daemon project, following example code.
- * I followed this sockets tutorial as well.
- * http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
+ * I followed another sockets tutorial before finding a better way on beej.us.
+ * This code comes primarily from the simple client on beej.us guide.
+ *
+ * http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#simpleclient
+	I used the above code as a guide and the below code follows along closely.
  *
  * This code connects to the server and will return the file descriptor.
+ *
  * */
-int serverSetUp(char * serverName, int portno)
+int serverSetUp(char * serverName, char * portno)
 {
 	int sockfd;
-	struct sockaddr_in serv_addr;
-	struct hostent *server;
+	struct addrinfo hints, *servinfo, *p;
 
-	//Make a socket. 0 makes it select TCP because it is a Sock Stream.
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0){
-		perror("ERROR opening socket");
+	memset(&hints,0,sizeof(hints));
+	hints.ai_family   = AF_UNSPEC; //get unspecified address (ipv4 and v6 now accpted).
+	hints.ai_socktype = SOCK_STREAM; // tcp
+
+	if(getaddrinfo(serverName, portno, &hints, &servinfo)!=0)	//This replaces get host by name.
+		{														//Much slicker implementation.
+		perror("ERROR!");										//http://linux.die.net/man/3/getaddrinfo
+		};
+
+	//Loop through all returned addresses attempting a connection
+	for(p = servinfo; p != NULL; p = p->ai_next)
+	{
+		//Attempt connection. Abort and move to next address if fail.
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                p->ai_protocol)) == -1) {
+            perror("client: socket");
+            continue;
+        }
+        if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+            close(sockfd);
+            perror("client: connect");
+            continue;
+        }
+        break;
+    }
+	if(p == NULL)
+	{
+		printf("Failed to connect on ANY addresses. Is server on?\n");
 		exit(2);
 	}
 
-	server = gethostbyname(serverName);
-	if (server == NULL) {
-		fprintf(stderr, "ERROR, no such host\n");
-		exit(2);
-	}
+return sockfd;
 
-	//Zero out the server address
-	bzero((char *) &serv_addr, sizeof(serv_addr));
-
-	//SetServer characteristics.
-	serv_addr.sin_family = AF_INET; //always set for AF_INET.
-	//Because this is a string it is required to be copied.
-	bcopy((char *) server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
-	serv_addr.sin_port = htons(portno);	//Set port number. Convert unsigned short integer to network byte order.
-
-	//cast to sockaddr to avoid warning.
-	if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
-		fprintf(stderr,"ERROR connecting. Is Server on?");
-		exit(2);
-	}
-	return sockfd;
 }
